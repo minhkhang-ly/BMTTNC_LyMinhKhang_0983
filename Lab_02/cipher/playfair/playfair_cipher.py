@@ -3,7 +3,7 @@ class PlayFairCipher:
         pass
 
     def create_playfair_matrix(self, key):
-        key = key.replace("J", "I") # Chuyển "J" thành "I" trong khoá
+        key = key.replace("J", "I") 
         key = key.upper()
         # Filter duplicates from the key while preserving order
         unique_key = []
@@ -32,19 +32,38 @@ class PlayFairCipher:
                 if matrix[row][col] == letter:
                     return row, col
         return None
+    # =========================================================
+    def split_pairs(self, text): # he lx lo yo ux
+        text = text.upper().replace("J", "I").replace(" ", "")
+        pairs = []
+        i = 0
+        
+        while i < len(text):
+            a = text[i]
+            if i + 1 < len(text):
+                b = text[i+1]
+                if a == b:
+                    pairs.append(a + "X")
+                    i += 1
+                else:
+                    pairs.append(a + b)
+                    i += 2
+            else:
+                pairs.append(a + "X")
+                i += 1
+        return pairs
 
+    # =========================================================
+    # 2. HÀM ENCRYPT GỌI HÀM SPLIT_PAIRS THEO ẢNH GIẢNG VIÊN
+    # =========================================================
     def playfair_encrypt(self, plain_text, matrix):
-        # Chuyển "J" thành "I" trong văn bản đầu vào
-        plain_text = plain_text.replace("J", "I")
-        plain_text = plain_text.upper()
-        plain_text = "".join([c for c in plain_text if c.isalpha()])
+        pairs = self.split_pairs(plain_text)
         encrypted_text = ""
-        for i in range(0, len(plain_text), 2):
-            pair = plain_text[i:i+2]
-            if len(pair) == 1: # Xử lý nếu số lượng ký tự lẻ
-                pair += "X"
+        
+        for pair in pairs:
             row1, col1 = self.find_letter_coords(matrix, pair[0])
             row2, col2 = self.find_letter_coords(matrix, pair[1])
+            
             if row1 == row2:
                 encrypted_text += matrix[row1][(col1 + 1) % 5] + matrix[row2][(col2 + 1) % 5]
             elif col1 == col2:
@@ -77,7 +96,6 @@ class PlayFairCipher:
             return ""
 
         banro = ""
-        # Loại bỏ ký tự 'X' nếu nó là ký tự cuối cùng và là ký tự được thêm vào
         for i in range(0, len(decrypted_text) - 2, 2):
             if decrypted_text[i+1] == "X" and decrypted_text[i] == decrypted_text[i+2]:
                 banro += decrypted_text[i]
